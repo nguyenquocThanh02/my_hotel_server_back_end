@@ -17,7 +17,15 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class RoomService implements IRoomService {
+
+
     private final RoomRepository roomRepository;
+
+    @Override
+    public Optional<Room> getRoomById(Long roomId) {
+        return Optional.of(roomRepository.findById(roomId).get());
+    }
+
 
     @Override
     public List<Room> getAllRoom() {
@@ -54,4 +62,28 @@ public class RoomService implements IRoomService {
         return roomRepository.findDistinctRoomType();
     }
 
+    @Override
+    public void deleteRoom(Long roomId) {
+        Optional<Room> room = roomRepository.findById(roomId);
+        if(room.isPresent()){
+            roomRepository.deleteById(roomId);
+        }
+    }
+
+    @Override
+    public void updateRoom(Long roomId, MultipartFile roomImage, String roomType, BigDecimal roomPrice, String roomDetails) throws IOException, SQLException {
+        Optional<Room> roomOptional = roomRepository.findById(roomId);
+        if (roomOptional.isPresent()) {
+            Room room = roomOptional.get();
+            room.setRoomDetails(roomDetails);
+            room.setRoomPrice(roomPrice);
+            room.setRoomType(roomType);
+            if (!roomImage.isEmpty()) {
+                byte[] imageBytes = roomImage.getBytes();
+                Blob imageBlob = new SerialBlob(imageBytes);
+                room.setRoomImage(imageBlob);
+            }
+            roomRepository.save(room);
+        }
+    }
 }

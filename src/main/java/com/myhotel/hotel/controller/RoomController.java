@@ -5,6 +5,7 @@ import com.myhotel.hotel.model.Room;
 import com.myhotel.hotel.response.RoomResponse;
 import com.myhotel.hotel.service.IRoomService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,6 +17,7 @@ import org.apache.tomcat.util.codec.binary.Base64;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,6 +41,18 @@ public class RoomController {
         return roomService.getAllRoomType();
     }
 
+    @GetMapping("get/{roomId}")
+    public ResponseEntity<RoomResponse> getRoomById(@PathVariable Long roomId) throws SQLException {
+        Optional<Room> room = roomService.getRoomById(roomId);
+        byte[] imageByte = roomService.getImageRoomById(room.get().getId());
+        String base64Photo = "";
+        if(imageByte != null && imageByte.length > 0){
+            base64Photo = Base64.encodeBase64String(imageByte);
+        }
+        RoomResponse response = getRoomResponse(room.get());
+        response.setRoomImage(base64Photo);
+        return ResponseEntity.ok(response);
+    }
     @GetMapping("get-all/room")
     public ResponseEntity<List<RoomResponse>> getAllRoom() throws SQLException {
         List<Room> rooms = roomService.getAllRoom();
@@ -58,5 +72,22 @@ public class RoomController {
     private RoomResponse getRoomResponse(Room room) {
 //        List<Booked> bookings = getAllBookingById(room.getId());
         return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.getRoomDetails());
+    }
+
+    @DeleteMapping("/delete/{roomId}")
+    public ResponseEntity<Void> deleteRoom(@PathVariable Long roomId){
+        roomService.deleteRoom(roomId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/update/{roomId}")
+    public ResponseEntity<Void> updateRoom(@PathVariable Long roomId,
+                                           @RequestParam(required = false) MultipartFile roomImage,
+                                           @RequestParam(required = false) String roomType,
+                                           @RequestParam(required = false) BigDecimal roomPrice,
+                                           @RequestParam(required = false) String roomDetails) throws SQLException, IOException {
+
+        roomService.updateRoom(roomId, roomImage, roomType, roomPrice, roomDetails);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
