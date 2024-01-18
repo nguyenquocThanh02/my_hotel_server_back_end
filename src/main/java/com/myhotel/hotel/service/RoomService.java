@@ -49,7 +49,7 @@ public class RoomService implements IRoomService {
         room.setRoomDetails(roomDetails);
         room.setRoomPrice(roomPrice);
         room.setRoomType(roomType);
-        if(!roomImage.isEmpty()){
+        if(roomImage!= null && !roomImage.isEmpty()){
             byte[] imageBytes = roomImage.getBytes();
             Blob imageBlob = new SerialBlob(imageBytes);
             room.setRoomImage(imageBlob);
@@ -71,16 +71,16 @@ public class RoomService implements IRoomService {
     }
 
     @Override
-    public void updateRoom(Long roomId, MultipartFile roomImage, String roomType, BigDecimal roomPrice, String roomDetails) throws IOException, SQLException {
+    public void updateRoom(Long roomId, byte[] roomImage, String roomType, BigDecimal roomPrice, String roomDetails) throws IOException, SQLException {
         Optional<Room> roomOptional = roomRepository.findById(roomId);
         if (roomOptional.isPresent()) {
             Room room = roomOptional.get();
             room.setRoomDetails(roomDetails);
             room.setRoomPrice(roomPrice);
             room.setRoomType(roomType);
-            if (!roomImage.isEmpty()) {
-                byte[] imageBytes = roomImage.getBytes();
-                Blob imageBlob = new SerialBlob(imageBytes);
+
+            if (roomImage != null) {
+                Blob imageBlob = new SerialBlob(roomImage);
                 room.setRoomImage(imageBlob);
             }
             roomRepository.save(room);

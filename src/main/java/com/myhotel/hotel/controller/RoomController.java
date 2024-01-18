@@ -86,8 +86,9 @@ public class RoomController {
                                            @RequestParam(required = false) String roomType,
                                            @RequestParam(required = false) BigDecimal roomPrice,
                                            @RequestParam(required = false) String roomDetails) throws SQLException, IOException {
-
-        roomService.updateRoom(roomId, roomImage, roomType, roomPrice, roomDetails);
+        byte[] photoBytes = roomImage != null && !roomImage.isEmpty() ?
+                roomImage.getBytes() : roomService.getImageRoomById(roomId);
+        roomService.updateRoom(roomId, photoBytes, roomType, roomPrice, roomDetails);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

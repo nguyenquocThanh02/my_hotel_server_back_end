@@ -22,5 +22,5 @@ public interface IRoomService {
 
     Optional<Room> getRoomById(Long roomId);
 
-    void updateRoom(Long roomId, MultipartFile roomImage, String roomType, BigDecimal roomPrice, String roomDetails) throws IOException, SQLException;
+    void updateRoom(Long roomId, byte[] roomImage, String roomType, BigDecimal roomPrice, String roomDetails) throws IOException, SQLException;
 }

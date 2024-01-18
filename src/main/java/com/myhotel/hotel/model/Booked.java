@@ -27,6 +27,13 @@ public class Booked {
     @JoinColumn(name = "room_id")
     private Room room;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToOne(mappedBy = "booked", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Bill bill;
+
     public void setBookingConfirmCode(String bookingConfirmCode){
         this.bookingConfirmCode = bookingConfirmCode;
     }

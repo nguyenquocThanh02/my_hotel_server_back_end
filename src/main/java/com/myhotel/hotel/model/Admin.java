@@ -1,4 +1,26 @@
 package com.myhotel.hotel.model;
 
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.util.List;
+
+@Entity
+@Setter
+@Getter
+@NoArgsConstructor
 public class Admin {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String adminName;
+    private String adminEmail;
+    private String adminPassword;
+    private String adminRole;
+
+
+    @OneToMany(mappedBy = "admin", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<Bill> bills;
 }
