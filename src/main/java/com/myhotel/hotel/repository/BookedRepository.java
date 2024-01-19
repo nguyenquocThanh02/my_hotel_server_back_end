@@ -10,5 +10,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public interface BookedRepository extends JpaRepository<Booked, Long> {
+    List<Booked> findAllByRoom_Id(Long roomId);
 //    @Query("SELECT b FROM Booked b WHERE b.room.roomPrice = :roomPrice")
 }
