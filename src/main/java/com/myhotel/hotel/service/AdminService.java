@@ -2,6 +2,7 @@ package com.myhotel.hotel.service;
 
 import com.myhotel.hotel.model.Admin;
 import com.myhotel.hotel.repository.AdminRepository;
+import com.myhotel.hotel.response.AdminResponse;
 import com.myhotel.hotel.response.ErrorResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,6 +53,11 @@ public class AdminService implements IAdminService{
         if(!passwordEncoder.matches(adminPassword, theAdmin.getAdminPassword())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Password incorrect!!"));
         }
-        return ResponseEntity.ok(theAdmin);
+
+        AdminResponse adminResponse = new AdminResponse(
+            theAdmin.getId(), theAdmin.getAdminName(),
+                theAdmin.getAdminEmail(), theAdmin.getAdminRole()
+        );
+        return ResponseEntity.ok(adminResponse);
     }
 }

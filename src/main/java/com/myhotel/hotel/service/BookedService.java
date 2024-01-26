@@ -6,14 +6,18 @@ import com.myhotel.hotel.model.User;
 import com.myhotel.hotel.repository.BookedRepository;
 import com.myhotel.hotel.repository.RoomRepository;
 import com.myhotel.hotel.repository.UserRepository;
+import com.myhotel.hotel.response.BookedResponse;
 import com.myhotel.hotel.response.ErrorResponse;
+import com.myhotel.hotel.response.RoomResponse;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,11 +33,21 @@ public class BookedService implements IBookedService{
     @Override
     public ResponseEntity<?> createBooking(Long roomId, String userEmail, Booked bookingRequest) {
         Optional<Room> theRoom = roomRepository.findById(roomId);
+
+        if(userEmail.isEmpty()){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User email can not empty");
+        }
         User theUser = userRepository.findByUserEmail(userEmail);
+
+        if(theUser == null){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Can not find the user!");
+        }
 
         if(!theRoom.isPresent()){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Room does not exist!!"));
         }
+
+
 
         if(bookingRequest.getCheckOut().isBefore(bookingRequest.getCheckIn()) ||
             bookingRequest.getCheckOut().isEqual(bookingRequest.getCheckIn())){
@@ -75,4 +89,87 @@ public class BookedService implements IBookedService{
     public List<Booked> getBookedByRoomPrice() {
         return bookedRepository.findAll();
     }
+
+    @Override
+    public ResponseEntity<?> getBookedsByUserEmail(String userEmail) {
+        User theUser = userRepository.findByUserEmail(userEmail);
+
+        List<Booked> bookeds = bookedRepository.findAllExceptPrintedBillByUser_Id(theUser.getId());
+
+        if(bookeds.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("List booked is empty!!");
+        }
+        List<BookedResponse> bookedResponses = new ArrayList<>();
+
+        for (Booked booked : bookeds) {
+            BookedResponse bookedResponse = new BookedResponse();
+            bookedResponse.setId(booked.getId());
+            bookedResponse.setUserName(booked.getUserName());
+            bookedResponse.setUserEmail(booked.getUserEmail());
+            bookedResponse.setUserAmount(booked.getUserAmount());
+            bookedResponse.setBookingConfirmCode(booked.getBookingConfirmCode());
+            bookedResponse.setCheckIn(booked.getCheckIn());
+            bookedResponse.setCheckOut(booked.getCheckOut());
+
+            RoomResponse theRoomResponse = getRoomResponse(booked);
+            bookedResponse.setRoom(theRoomResponse);
+
+            bookedResponses.add(bookedResponse);
+        }
+
+        return ResponseEntity.ok(bookedResponses);
+    }
+
+
+
+    @Override
+    public ResponseEntity<?> getAllBookeds() {
+        List<Booked> bookeds = bookedRepository.findAllExceptPrintedBill();
+
+        if(bookeds.isEmpty()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("List booked is empty!!");
+        }
+        List<BookedResponse> bookedResponses = new ArrayList<>();
+
+        for (Booked booked : bookeds) {
+            BookedResponse bookedResponse = new BookedResponse();
+            bookedResponse.setId(booked.getId());
+            bookedResponse.setUserName(booked.getUserName());
+            bookedResponse.setUserEmail(booked.getUserEmail());
+            bookedResponse.setUserAmount(booked.getUserAmount());
+            bookedResponse.setBookingConfirmCode(booked.getBookingConfirmCode());
+            bookedResponse.setCheckIn(booked.getCheckIn());
+            bookedResponse.setCheckOut(booked.getCheckOut());
+
+            RoomResponse theRoomResponse = getRoomResponse(booked);
+            bookedResponse.setRoom(theRoomResponse);
+
+            bookedResponses.add(bookedResponse);
+        }
+
+        return ResponseEntity.ok(bookedResponses);
+    }
+
+    private RoomResponse getRoomResponse(Booked booked){
+//        Optional<Room> theRoom = roomRepository.findById(booked.getRoom().getId());
+
+//        RoomResponse roomResponse = new RoomResponse(theRoom.get().getId(), theRoom.get().getRoomType(),
+//                theRoom.get().getRoomPrice(), theRoom.get().getRoomDetails());
+        RoomResponse roomResponse = new RoomResponse(booked.getRoom().getId(), booked.getRoom().getRoomType(),
+                booked.getRoom().getRoomPrice(), booked.getRoom().getRoomDetails());
+
+        return roomResponse;
+    }
+
+    @Override
+    public ResponseEntity<?> deleteBookedsById(Long bookedId) {
+        Optional<Booked> booked = bookedRepository.findById(bookedId);
+        if(!booked.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The booked does not exist!");
+        }
+        bookedRepository.deleteById(bookedId);
+        return new ResponseEntity<>("Cancel booked successfully", HttpStatus.OK);
+    }
+
 }
+

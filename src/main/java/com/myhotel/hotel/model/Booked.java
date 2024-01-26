@@ -1,10 +1,7 @@
 package com.myhotel.hotel.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -22,6 +19,7 @@ public class Booked {
     private String userEmail;
     private int userAmount;
     private String bookingConfirmCode;
+    private boolean isBilled = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "room_id")
@@ -34,7 +32,15 @@ public class Booked {
     @OneToOne(mappedBy = "booked", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Bill bill;
 
+    public void setIsBilled(boolean isBilled){
+        this.isBilled = isBilled;
+    }
+
+    public boolean getIsBilled(){
+        return this.isBilled;
+    }
     public void setBookingConfirmCode(String bookingConfirmCode){
         this.bookingConfirmCode = bookingConfirmCode;
     }
+
 }

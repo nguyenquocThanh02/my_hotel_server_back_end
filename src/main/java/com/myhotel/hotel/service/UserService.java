@@ -3,6 +3,7 @@ package com.myhotel.hotel.service;
 import com.myhotel.hotel.model.User;
 import com.myhotel.hotel.repository.UserRepository;
 import com.myhotel.hotel.response.ErrorResponse;
+import com.myhotel.hotel.response.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,8 @@ public class UserService implements IUserService{
         if(!passwordEncoder.matches(userPassword, theUser.getUserPassword())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Password incorrect!!"));
         }
-        return ResponseEntity.ok(theUser);
+        UserResponse theUserResponse = new UserResponse(theUser.getId(),
+                theUser.getUserName(), theUser.getUserEmail());
+        return ResponseEntity.ok(theUserResponse);
     }
 }

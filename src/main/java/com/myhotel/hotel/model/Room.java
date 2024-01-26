@@ -1,10 +1,7 @@
 package com.myhotel.hotel.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.apache.commons.lang3.RandomStringUtils;
 
 import java.math.BigDecimal;

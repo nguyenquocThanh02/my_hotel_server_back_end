@@ -10,4 +10,10 @@ public interface IBookedService {
     List<Booked> getBookedByRoomPrice();
 
     ResponseEntity<?> createBooking(Long roomId, String userEmail, Booked bookingRequest);
+
+    ResponseEntity<?> getBookedsByUserEmail(String userEmail);
+
+    ResponseEntity<?> getAllBookeds();
+
+    ResponseEntity<?> deleteBookedsById(Long bookedId);
 }
