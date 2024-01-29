@@ -9,4 +9,6 @@ import java.util.List;
 public interface BillRepository extends JpaRepository<Bill, Long> {
     @Query("SELECT b FROM Bill b WHERE b.paid = false")
     List<Bill> findAllExceptPaid();
+    @Query("SELECT b FROM Bill b WHERE b.paid = true")
+    List<Bill> findAllPaid();
 }

@@ -9,13 +9,11 @@ import com.myhotel.hotel.repository.BookedRepository;
 import com.myhotel.hotel.response.AdminResponse;
 import com.myhotel.hotel.response.BillResponse;
 import com.myhotel.hotel.response.BookedResponse;
-import com.myhotel.hotel.response.ErrorResponse;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +72,34 @@ public class BillService implements IBillService{
     }
 
     @Override
-    public ResponseEntity<?> getAllBills() {
-        List<Bill> theBills = billRepository.findAllExceptPaid();
+    public ResponseEntity<?> unCompleteBill(Long billId) {
+        Optional<Bill> theBill = billRepository.findById(billId);
+
+        if(!theBill.isPresent()){
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bill id does not exist!");
+        }
+
+//        if ( theBill.get().getTimePrintBill().isBefore(LocalDateTime.now()) ) {
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("You can't change bill in past!");
+//        }
+
+        theBill.get().setPaid(false);
+        theBill.get().setTimePrintBill(null);
+
+        billRepository.save(theBill.get());
+
+        return ResponseEntity.ok("Un complete the bill");
+    }
+
+    @Override
+    public ResponseEntity<?> getAllBills(boolean param) {
+        List<Bill> theBills;
+
+        if(!param){
+            theBills = billRepository.findAllExceptPaid();
+        }else {
+            theBills = billRepository.findAllPaid();
+        }
 
         if(theBills.isEmpty()){
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Bill is empty!");

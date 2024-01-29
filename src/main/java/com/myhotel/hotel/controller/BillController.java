@@ -33,9 +33,14 @@ public class BillController {
         return billService.completeBill(billId);
     }
 
+    @PutMapping("/un/complete/{billId}")
+    public ResponseEntity<?> unCompleteBill(@PathVariable Long billId){
+        return billService.unCompleteBill(billId);
+    }
+
     @GetMapping("/get/all")
-    public ResponseEntity<?> getAllBills(){
-        return billService.getAllBills();
+    public ResponseEntity<?> getAllBills(@RequestParam(defaultValue = "false") boolean param){
+        return billService.getAllBills(param);
     }
 
 //    public BigDecimal getSaleFigure(@Parameter())
