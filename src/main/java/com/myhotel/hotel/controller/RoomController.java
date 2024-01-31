@@ -2,7 +2,9 @@ package com.myhotel.hotel.controller;
 
 import com.myhotel.hotel.model.Booked;
 import com.myhotel.hotel.model.Room;
+import com.myhotel.hotel.response.BookedResponse;
 import com.myhotel.hotel.response.RoomResponse;
+import com.myhotel.hotel.service.IBookedService;
 import com.myhotel.hotel.service.IRoomService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,7 @@ import java.util.Optional;
 public class RoomController {
 
     private final IRoomService roomService;
+    private final IBookedService bookedService;
 
     @PostMapping("/add/room")
     public ResponseEntity<Room> addNewRoom(
@@ -70,8 +73,23 @@ public class RoomController {
     }
 
     private RoomResponse getRoomResponse(Room room) {
-//        List<Booked> bookings = getAllBookingById(room.getId());
-        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.getRoomDetails());
+        List<Booked> bookings = bookedService.getAllBookingById(room.getId());
+        List<BookedResponse> bookingResponses = new ArrayList<>();
+        for( Booked booked : bookings){
+            BookedResponse bookedResponse = new BookedResponse();
+            bookedResponse.setId(booked.getId());
+            bookedResponse.setUserName(booked.getUserName());
+            bookedResponse.setUserEmail(booked.getUserEmail());
+            bookedResponse.setUserAmount(booked.getUserAmount());
+            bookedResponse.setBookingConfirmCode(booked.getBookingConfirmCode());
+            bookedResponse.setCheckIn(booked.getCheckIn());
+            bookedResponse.setCheckOut(booked.getCheckOut());
+
+            bookingResponses.add(bookedResponse);
+        }
+
+
+        return new RoomResponse(room.getId(), room.getRoomType(), room.getRoomPrice(), room.getRoomDetails(), bookingResponses);
     }
 
     @DeleteMapping("/delete/{roomId}")

@@ -9,15 +9,19 @@ import com.myhotel.hotel.repository.BookedRepository;
 import com.myhotel.hotel.response.AdminResponse;
 import com.myhotel.hotel.response.BillResponse;
 import com.myhotel.hotel.response.BookedResponse;
+import com.myhotel.hotel.response.ReportResponse;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -149,4 +153,22 @@ public class BillService implements IBillService{
         );
     }
 
+    @Override
+    public ResponseEntity<?> getReport(YearMonth selectedMonth) {
+        List<Bill> bills = billRepository.findAllPaid();
+
+        BigDecimal sum = BigDecimal.ZERO;
+        Integer count = 0;
+
+        for(Bill bill : bills){
+            YearMonth billYearMonth = YearMonth.from(bill.getTimePrintBill());
+            if(billYearMonth.equals(selectedMonth)){
+                sum = sum.add(bill.getTotalPrice());
+                count = count + 1;
+            }
+        }
+
+        ReportResponse reportResponse = new ReportResponse(sum, count);
+        return ResponseEntity.ok(reportResponse);
+    }
 }

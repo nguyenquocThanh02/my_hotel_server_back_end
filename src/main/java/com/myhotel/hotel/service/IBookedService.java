@@ -16,4 +16,6 @@ public interface IBookedService {
     ResponseEntity<?> getAllBookeds();
 
     ResponseEntity<?> deleteBookedsById(Long bookedId);
+
+    List<Booked> getAllBookingById(Long id);
 }

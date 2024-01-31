@@ -1,8 +1,10 @@
 package com.myhotel.hotel.controller;
 
 import com.myhotel.hotel.model.Booked;
+import com.myhotel.hotel.service.EmailService;
 import com.myhotel.hotel.service.IBookedService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,6 +18,7 @@ import java.util.List;
 public class BookedController {
 
     private final IBookedService bookedService;
+    private final EmailService emailService;
 
     @PostMapping("/{roomId}/by/{userEmail}")
     public ResponseEntity<?> createBooking(@PathVariable Long roomId, @PathVariable String userEmail,
@@ -41,5 +44,11 @@ public class BookedController {
     public ResponseEntity<?> deleteBookedsById(@PathVariable Long bookedId){
         return bookedService.deleteBookedsById(bookedId);
     }
+
+//    @PostMapping("/confirm/booked")
+//    public String sendMailBookingConfirmation(){
+//        emailService.sendMailBookingConfirmation("abc@student.ctu.edu.vn", "abcdef", "thanhne");
+//        return "Booking confirmed success!";
+//    }
 }
 

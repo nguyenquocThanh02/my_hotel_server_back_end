@@ -25,10 +25,10 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BookedService implements IBookedService{
 
-
     private final BookedRepository bookedRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final EmailService emailService;
 
     @Override
     public ResponseEntity<?> createBooking(Long roomId, String userEmail, Booked bookingRequest) {
@@ -62,6 +62,10 @@ public class BookedService implements IBookedService{
             bookingRequest.setUser(theUser);
             bookingRequest.setBookingConfirmCode(RandomStringUtils.randomNumeric(5));
             bookedRepository.save(bookingRequest);
+
+//            confirm by send mail
+            emailService.sendMailBookingConfirmation(bookingRequest.getUserEmail(), bookingRequest.getBookingConfirmCode(), bookingRequest.getUserName());
+
             return ResponseEntity.ok().body("Congratulation successfully to booking: "+ bookingRequest.getBookingConfirmCode());
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Room is not available for day!"));
@@ -170,6 +174,12 @@ public class BookedService implements IBookedService{
         bookedRepository.deleteById(bookedId);
         return new ResponseEntity<>("Cancel booked successfully", HttpStatus.OK);
     }
+
+    @Override
+    public List<Booked> getAllBookingById(Long id) {
+        return bookedRepository.findAllByRoom_Id(id);
+    }
+
 
 }
 
