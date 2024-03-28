@@ -66,7 +66,7 @@ public class BookedService implements IBookedService{
 //            confirm by send mail
             emailService.sendMailBookingConfirmation(bookingRequest.getUserEmail(), bookingRequest.getBookingConfirmCode(), bookingRequest.getUserName());
 
-            return ResponseEntity.ok().body("Congratulation successfully to booking: "+ bookingRequest.getBookingConfirmCode());
+            return ResponseEntity.ok().body("Congratulation successfully to booking: "+ bookingRequest.getBookingConfirmCode() + " Check email to confirm.");
         }else{
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse("Room is not available for day!"));
         }

@@ -25,8 +25,8 @@ public class EmailService {
             helper.setText("Dear " + userName + ",\n\n"
                     + "Your booking with code: " + bookingCode + " has been confirmed.\n"
                     + "Thank you for choosing our service!\n"
-                    + "Please check in the detail information in website!\n"
-                    + "Best regards,\nThe Booking Team");
+                    + "Please check in the detail information in website!\n\n"
+                    + "Best regards,\n MyHotel");
 
             javaMailSender.send(message);
         } catch (MessagingException e) {
