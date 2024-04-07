@@ -6,10 +6,7 @@ import com.myhotel.hotel.model.Booked;
 import com.myhotel.hotel.repository.AdminRepository;
 import com.myhotel.hotel.repository.BillRepository;
 import com.myhotel.hotel.repository.BookedRepository;
-import com.myhotel.hotel.response.AdminResponse;
-import com.myhotel.hotel.response.BillResponse;
-import com.myhotel.hotel.response.BookedResponse;
-import com.myhotel.hotel.response.ReportResponse;
+import com.myhotel.hotel.response.*;
 import lombok.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,10 +15,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -170,5 +164,31 @@ public class BillService implements IBillService{
 
         ReportResponse reportResponse = new ReportResponse(sum, count);
         return ResponseEntity.ok(reportResponse);
+    }
+
+    @Override
+    public ResponseEntity<?> getReveneuInYear(int selectedYear) {
+        List<Bill> bills = billRepository.findAllPaid();
+
+        Map<Integer, BigDecimal> months = new HashMap<>();
+        for(int i=1; i<=12; i++){
+            months.put(i, revenueOfMonth(i, selectedYear,bills));
+        }
+
+        return ResponseEntity.ok(months);
+    }
+
+    private BigDecimal revenueOfMonth(int i, int year, List<Bill> bills){
+        BigDecimal sum = BigDecimal.ZERO;
+
+        for(Bill bill : bills){
+            YearMonth billYearMonth = YearMonth.from(bill.getTimePrintBill());
+            YearMonth targetYearMonth = YearMonth.of(year, i);
+
+            if(billYearMonth.equals(targetYearMonth)){
+                sum = sum.add(bill.getTotalPrice());
+            }
+        }
+        return sum;
     }
 }

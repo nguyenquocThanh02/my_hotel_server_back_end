@@ -15,4 +15,6 @@ public interface IBillService {
     ResponseEntity<?> unCompleteBill(Long billId);
 
     ResponseEntity<?> getReport(YearMonth selectedMonth);
+
+    ResponseEntity<?> getReveneuInYear(int selectedYear);
 }

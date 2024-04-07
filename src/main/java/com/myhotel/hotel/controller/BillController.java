@@ -51,5 +51,9 @@ public class BillController {
         return billService.getReport(selectedMonth);
     }
 
-//    public BigDecimal getSaleFigure(@Parameter())
+    @GetMapping("/get/revenueInYear")
+    public ResponseEntity<?> getRevenueInYear(@RequestParam(name = "selectedYear") int selectedYear) {
+        return billService.getReveneuInYear(selectedYear);
+    }
+
 }
