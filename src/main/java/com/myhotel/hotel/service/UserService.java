@@ -1,6 +1,8 @@
 package com.myhotel.hotel.service;
 
+import com.myhotel.hotel.model.History_user;
 import com.myhotel.hotel.model.User;
+import com.myhotel.hotel.repository.HistoryUserRepository;
 import com.myhotel.hotel.repository.UserRepository;
 import com.myhotel.hotel.response.ErrorResponse;
 import com.myhotel.hotel.response.UserResponse;
@@ -10,12 +12,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class UserService implements IUserService{
 
 
     private final UserRepository userRepository;
+    private final HistoryUserRepository historyUserRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -43,6 +48,14 @@ public class UserService implements IUserService{
         newUser.setUserName(userName);
         newUser.setUserPassword(passwordEncoder.encode(userPassword));
         userRepository.save(newUser);
+
+        //save history register
+        History_user historyUser = new History_user();
+        historyUser.setAction("Register");
+        historyUser.setTime(LocalDateTime.now());
+        historyUser.setUser(newUser);
+
+        historyUserRepository.save(historyUser);
         return ResponseEntity.ok(newUser);
 //        return ResponseEntity.ok(userRepository.save(newUser));
     }
@@ -58,6 +71,15 @@ public class UserService implements IUserService{
         }
         UserResponse theUserResponse = new UserResponse(theUser.getId(),
                 theUser.getUserName(), theUser.getUserEmail());
+
+//    Save history login
+        History_user historyUser = new History_user();
+        historyUser.setAction("Login");
+        historyUser.setTime(LocalDateTime.now());
+        historyUser.setUser(theUser);
+
+        historyUserRepository.save(historyUser);
+
         return ResponseEntity.ok(theUserResponse);
     }
 }

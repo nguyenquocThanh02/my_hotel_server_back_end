@@ -1,9 +1,11 @@
 package com.myhotel.hotel.service;
 
 import com.myhotel.hotel.model.Booked;
+import com.myhotel.hotel.model.History_user;
 import com.myhotel.hotel.model.Room;
 import com.myhotel.hotel.model.User;
 import com.myhotel.hotel.repository.BookedRepository;
+import com.myhotel.hotel.repository.HistoryUserRepository;
 import com.myhotel.hotel.repository.RoomRepository;
 import com.myhotel.hotel.repository.UserRepository;
 import com.myhotel.hotel.response.BookedResponse;
@@ -17,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -28,6 +31,7 @@ public class BookedService implements IBookedService{
     private final BookedRepository bookedRepository;
     private final RoomRepository roomRepository;
     private final UserRepository userRepository;
+    private final HistoryUserRepository historyUserRepository;
     private final EmailService emailService;
 
     @Override
@@ -63,8 +67,16 @@ public class BookedService implements IBookedService{
             bookingRequest.setBookingConfirmCode(RandomStringUtils.randomNumeric(5));
             bookedRepository.save(bookingRequest);
 
-//            confirm by send mail
+            //confirm by send mail
             emailService.sendMailBookingConfirmation(bookingRequest.getUserEmail(), bookingRequest.getBookingConfirmCode(), bookingRequest.getUserName());
+
+            //save history book room
+            History_user historyUser = new History_user();
+            historyUser.setAction("Booked room");
+            historyUser.setTime(LocalDateTime.now());
+            historyUser.setUser(theUser);
+
+            historyUserRepository.save(historyUser);
 
             return ResponseEntity.ok().body("Congratulation successfully to booking: "+ bookingRequest.getBookingConfirmCode() + " Check email to confirm.");
         }else{
@@ -172,6 +184,7 @@ public class BookedService implements IBookedService{
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The booked does not exist!");
         }
         bookedRepository.deleteById(bookedId);
+
         return new ResponseEntity<>("Cancel booked successfully", HttpStatus.OK);
     }
 
